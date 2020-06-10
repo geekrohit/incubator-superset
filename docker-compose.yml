@@ -33,6 +33,11 @@ x-superset-volumes: &superset-volumes
 
 version: "3.7"
 services:
+  firefox:
+    image: instrumentisto/geckodriver
+    restart: unless-stopped
+    shm_size: 2g
+
   redis:
     image: redis:3.2
     restart: unless-stopped
@@ -76,7 +81,7 @@ services:
 
   superset-worker:
     build: *superset-build
-    command: ["celery", "worker", "--app=superset.tasks.celery_app:app", "-Ofair"]
+    command: ["celery", "worker", "--app=superset.tasks.celery_app:app", "-Ofair", "--max-tasks-per-child=128", "--pool=prefork"]
     env_file: docker/.env
     restart: unless-stopped
     depends_on: *superset-depends-on
